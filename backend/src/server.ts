@@ -1,7 +1,7 @@
 import "dotenv/config";
 import cors from "cors";
 import express from "express";
-// import authRoutes from "./routes/authRoutes";
+import authRoutes from "./routes/authRoutes";
 // import todoRoutes from "./routes/todoRoutes";
 import initDB from "./config/initDB";
 
@@ -10,7 +10,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// app.use("/api/auth", authRoutes);
+app.use("/api/auth", authRoutes);
 // app.use("/todos", todoRoutes);
 
 const PORT = Number(process.env.PORT || 5000);
