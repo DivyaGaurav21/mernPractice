@@ -1,19 +1,72 @@
+
+import { useState } from "react";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+
+import AuthForm from "./components/AuthForm";
+import ProtectedRoute from "./components/ProtectedRoute";
+import type { AuthDetails, User } from "./types";
+import * as api from "./lib/api";
+import Todos from "./components/Todos";
+
 function App() {
+  const [authBusy, setAuthBusy] = useState(false);
+  const [authError, setAuthError] = useState("");
+  const [user, setUser] = useState<User | null>(api.readStoredUser);
+
+  async function handleAuth(
+    details: AuthDetails,
+    isRegister: boolean
+  ) {
+    setAuthBusy(true);
+    setAuthError("");
+
+    try {
+      const response = isRegister
+        ? await api.signUp(details)
+        : await api.signIn(details);
+
+      localStorage.setItem("todo-token", response.token);
+      localStorage.setItem("todo-user", JSON.stringify(response.user));
+
+      setUser(response.user);
+
+    } catch (requestError) {
+      setAuthError(api.getErrorMessage(requestError));
+    } finally {
+      setAuthBusy(false);
+    }
+  }
+
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-50 px-6 text-slate-900">
-      <section className="w-full max-w-xl rounded-2xl border border-slate-200 bg-white p-8 shadow-sm sm:p-10">
-        <p className="mb-3 text-sm font-semibold tracking-wide text-indigo-600">
-          TASK MANAGER
-        </p>
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-          Frontend is ready
-        </h1>
-        <p className="mt-4 leading-7 text-slate-600">
-          React, TypeScript, Tailwind CSS, and Axios are set up. Start building
-          your application here.
-        </p>
-      </section>
-    </main>
+    <BrowserRouter>
+      <Routes>
+        {/* Public Route */}
+        <Route
+          path="/"
+          element={
+            user ? (
+              <Navigate to="/todos" replace />
+            ) : (
+              <AuthForm
+                busy={authBusy}
+                error={authError}
+                onSubmit={handleAuth}
+              />
+            )
+          }
+        />
+
+        {/* Protected Route */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/todos" element={<Todos />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
