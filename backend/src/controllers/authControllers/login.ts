@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import type { RequestHandler } from "express";
 import jwt from "jsonwebtoken";
 import { pool } from "../../config/db";
-import { AuthBody, UserRow } from "../controllerTypes";
+import { AuthBody, UserRow } from "../../type"
 
 
 const createToken = (id: number, email: string): string => {

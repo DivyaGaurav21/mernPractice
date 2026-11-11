@@ -3,7 +3,7 @@ import type { RequestHandler } from "express";
 import jwt from "jsonwebtoken";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { pool } from "../../config/db";
-import { AuthBody } from "../controllerTypes";
+import { AuthBody } from "../../type";
 
 
 const createToken = (id: number, email: string): string => {
